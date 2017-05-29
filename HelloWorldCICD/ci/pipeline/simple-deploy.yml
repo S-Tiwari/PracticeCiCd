@@ -1,0 +1,32 @@
+common:
+  git: &git-defaults
+    branch: master
+    username: {{github-user}}
+    password: {{github-password}}
+
+resources:
+- name: app_sources
+  type: git
+  source:
+  uri: https://github.com/inContact/controls-eventhub.git
+  <<: *git-defaults
+  branch: master
+
+jobs:
+- name: simple-deploy
+  plan:
+  - get: app_sources
+  - task: list-repo-content
+    config:
+      platform: linux
+      inputs:
+      - name: app_sources
+      image_resource:
+        type: docker-image
+        source: {repository: busybox}
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          ls -R ./ci
